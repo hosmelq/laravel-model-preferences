@@ -1,0 +1,9 @@
+migrations:
+  - database/migrations
+  - workbench/database/migrations
+
+providers:
+  - HosmelQ\ModelPreferences\PreferencesServiceProvider
+
+workbench:
+  install: false

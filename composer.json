@@ -1,0 +1,92 @@
+{
+    "name": "hosmelq/laravel-model-preferences",
+    "description": "A Laravel package for managing model preferences with type-safe caching.",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "hosmelq",
+        "eloquent",
+        "laravel",
+        "laravel-preferences",
+        "laravel-settings",
+        "php",
+        "preferences",
+        "settings"
+    ],
+    "authors": [
+        {
+            "name": "Hosmel Quintana",
+            "email": "hosmelq@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0 || ^12.0",
+        "illuminate/database": "^11.0 || ^12.0",
+        "illuminate/support": "^11.0 || ^12.0",
+        "spatie/laravel-package-tools": "^1.92",
+        "thecodingmachine/safe": "^3.3"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.47",
+        "larastan/larastan": "^3.6",
+        "laravel/pint": "^1.24",
+        "orchestra/pest-plugin-testbench": "^3.2",
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "pestphp/pest": "^3.8",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "rector/rector": "^2.1",
+        "rector/type-perfect": "^2.1",
+        "shipmonk/composer-dependency-analyser": "^1.8",
+        "spaze/phpstan-disallowed-calls": "^4.6",
+        "thecodingmachine/phpstan-safe-rule": "^1.4",
+        "ticketswap/phpstan-error-formatter": "^1.1",
+        "tomasvotruba/type-coverage": "^2.0"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "HosmelQ\\ModelPreferences\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HosmelQ\\ModelPreferences\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HosmelQ\\ModelPreferences\\PreferencesServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse --configuration=phpstan.neon.dist --memory-limit=4G",
+        "pint": "pint",
+        "rector": "rector",
+        "test": "pest --ci"
+    },
+    "scripts-descriptions": {
+        "phpstan": "Run PHPStan static analysis.",
+        "pint": "Format code using Laravel Pint.",
+        "rector": "Run Rector automated refactoring.",
+        "test": "Run the test suite using Pest."
+    },
+    "$schema": "https://getcomposer.org/schema.json"
+}

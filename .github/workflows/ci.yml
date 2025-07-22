@@ -1,0 +1,99 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  check-unused-composer-dependencies:
+    name: Check unused composer dependencies
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check unused composer dependencies
+        uses: hosmelq/.github/.github/actions/composer-unused-dependencies-check@main
+        with:
+          php-version: '8.2'
+
+  check-composer:
+    name: Check composer
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check composer normalize
+        uses: hosmelq/.github/.github/actions/composer-normalize-check@main
+        with:
+          php-version: '8.2'
+
+  check-static-code:
+    name: Check static code
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check static code
+        uses: hosmelq/.github/.github/actions/phpstan-check@main
+        with:
+          php-version: '8.2'
+
+  check-code-quality:
+    name: Check code quality
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check code quality
+        uses: hosmelq/.github/.github/actions/php-rector-check@main
+        with:
+          php-version: '8.2'
+
+  check-code-style:
+    name: Check code style
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check code style
+        uses: hosmelq/.github/.github/actions/php-pint-check@main
+        with:
+          php-version: '8.2'
+
+  tests:
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+        laravel: [11, 12]
+        include:
+          - laravel: 11
+            testbench: 9
+          - laravel: 12
+            testbench: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install composer dependencies
+        uses: hosmelq/.github/.github/actions/composer-install@main
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Install composer matrix dependencies
+        run: |
+          composer require "laravel/framework:^${{ matrix.laravel }}" "orchestra/testbench:^${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction
+
+      - name: Run tests
+        run: composer test
