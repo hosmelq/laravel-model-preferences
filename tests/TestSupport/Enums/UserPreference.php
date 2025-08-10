@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Workbench\App\Enums;
+namespace HosmelQ\ModelPreferences\Tests\TestSupport\Enums;
 
 enum UserPreference: string
 {

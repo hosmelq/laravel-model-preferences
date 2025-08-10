@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences\Exceptions;
 
-use Exception;
 use Illuminate\Contracts\Validation\Validator;
+use InvalidArgumentException;
 
-class PreferenceValidationException extends Exception
+class PreferenceValidationException extends InvalidArgumentException
 {
     /**
      * Create a new preference validation exception instance.

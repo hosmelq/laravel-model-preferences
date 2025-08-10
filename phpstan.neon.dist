@@ -6,9 +6,11 @@ includes:
 
 parameters:
   checkBenevolentUnionTypes: true
+  checkConfigTypes: true
   checkModelProperties: true
   checkOctaneCompatibility: true
   editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
+  noUnnecessaryEnumerableToArrayCalls: true
   errorFormat: ticketswap
   level: max
   noEnvCallsOutsideOfConfig: true
@@ -17,9 +19,6 @@ parameters:
   ignoreErrors:
     -
       identifier: trait.unused
-    -
-      identifier: staticMethod.dynamicCall
-      path: src/Repositories/PreferenceRepository.php
   type_coverage:
     constant: 100
     declare: 100

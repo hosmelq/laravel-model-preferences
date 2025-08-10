@@ -12,10 +12,16 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table): void {
+        Schema::create('users_preferences', function (Blueprint $table): void {
             $table->id();
+            $table->unsignedBigInteger('model_id');
+
+            $table->string('key');
+            $table->json('value')->nullable();
 
             $table->timestamps();
+
+            $table->unique(['model_id', 'key']);
         });
     }
 };

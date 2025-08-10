@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Workbench\App\Enums\UserPreference;
+use HosmelQ\ModelPreferences\Tests\TestSupport\Enums\UserPreference;
 
 dataset('complex values', [
     'mixed array' => [

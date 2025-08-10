@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences;
 
-use HosmelQ\ModelPreferences\Contracts\PreferenceRepository as PreferenceRepositoryContract;
-use HosmelQ\ModelPreferences\Repositories\PreferenceRepository;
+use HosmelQ\ModelPreferences\Commands\MakePreferencesTable;
+use Illuminate\Contracts\Container\Container;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class PreferencesServiceProvider extends PackageServiceProvider
+class ModelPreferencesServiceProvider extends PackageServiceProvider
 {
     /**
      * Configure package.
@@ -20,6 +20,7 @@ class PreferencesServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-model-preferences')
             ->hasConfigFile()
+            ->hasCommand(MakePreferencesTable::class)
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command
                     ->askToRunMigrations()
@@ -35,6 +36,14 @@ class PreferencesServiceProvider extends PackageServiceProvider
      */
     public function packageRegistered(): void
     {
-        $this->app->bind(PreferenceRepositoryContract::class, PreferenceRepository::class);
+        $this->app->singleton(PreferencesManager::class, $this->createPreferencesManager(...));
+    }
+
+    /**
+     * Create preferences manager instance.
+     */
+    private function createPreferencesManager(Container $app): PreferencesManager
+    {
+        return new PreferencesManager($app);
     }
 }

@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences\Contracts;
 
-use HosmelQ\ModelPreferences\Models\Preference;
+use HosmelQ\ModelPreferences\Support\PreferencesConfig;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
- * @template TDeclaringModel of Model
+ * @phpstan-require-extends Model
  */
 interface HasPreferences
 {
     /**
-     * Get the preferences for the model.
-     *
-     * @return MorphMany<Preference, TDeclaringModel>
+     * Build the preferences configuration for the model.
      */
-    public function preferences(): MorphMany;
+    public function preferencesConfig(): PreferencesConfig;
 }

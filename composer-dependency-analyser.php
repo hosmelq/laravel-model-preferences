@@ -11,5 +11,4 @@ return (new Configuration())
         'illuminate/contracts',
         'illuminate/database',
         'illuminate/support',
-        'thecodingmachine/safe',
     ], [ErrorType::UNUSED_DEPENDENCY]);
