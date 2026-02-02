@@ -3,7 +3,9 @@ migrations:
   - workbench/database/migrations
 
 providers:
-  - HosmelQ\ModelPreferences\PreferencesServiceProvider
+  - HosmelQ\ModelPreferences\ModelPreferencesServiceProvider
 
 workbench:
+  config: true
+
   install: false

@@ -1,6 +1,6 @@
 {
     "name": "hosmelq/laravel-model-preferences",
-    "description": "A Laravel package for managing model preferences with type-safe caching.",
+    "description": "Per-model preferences for Laravel with defaults and validation.",
     "license": "MIT",
     "type": "library",
     "keywords": [
@@ -28,22 +28,23 @@
         "thecodingmachine/safe": "^3.3"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.47",
-        "larastan/larastan": "^3.6",
-        "laravel/pint": "^1.24",
+        "ergebnis/composer-normalize": "^2.49",
+        "larastan/larastan": "^3.9",
+        "laravel/pint": "^1.27",
         "orchestra/pest-plugin-testbench": "^3.2",
         "orchestra/testbench": "^9.0 || ^10.0",
         "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.2",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
-        "rector/rector": "^2.1",
+        "rector/rector": "^2.3",
         "rector/type-perfect": "^2.1",
         "shipmonk/composer-dependency-analyser": "^1.8",
-        "spaze/phpstan-disallowed-calls": "^4.6",
+        "spaze/phpstan-disallowed-calls": "^4.7",
         "thecodingmachine/phpstan-safe-rule": "^1.4",
-        "ticketswap/phpstan-error-formatter": "^1.1",
-        "tomasvotruba/type-coverage": "^2.0"
+        "ticketswap/phpstan-error-formatter": "^1.2",
+        "tomasvotruba/type-coverage": "^2.1"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -57,8 +58,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "HosmelQ\\ModelPreferences\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "HosmelQ\\ModelPreferences\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -72,7 +72,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "HosmelQ\\ModelPreferences\\PreferencesServiceProvider"
+                "HosmelQ\\ModelPreferences\\ModelPreferencesServiceProvider"
             ]
         }
     },

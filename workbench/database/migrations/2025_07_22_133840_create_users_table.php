@@ -15,6 +15,8 @@ return new class () extends Migration {
         Schema::create('users', function (Blueprint $table): void {
             $table->id();
 
+            $table->json('preferences')->nullable();
+
             $table->timestamps();
         });
     }

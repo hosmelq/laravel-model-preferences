@@ -2,35 +2,51 @@
 
 declare(strict_types=1);
 
-use HosmelQ\ModelPreferences\Models\Preference;
-
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Preferences Table Name
+    | Default Preference Store
     |--------------------------------------------------------------------------
     |
-    | This is the name of the table that will be used to store preferences.
-    | You can change this to any table name you prefer.
+    | This option controls the default preference store that will be used.
+    | This connection is utilized if no other store is explicitly specified
+    | when running a preference operation within the application. Models
+    | may override this default by implementing preferencesConfig().
+    |
+    | Supported: "column", "shared", "table"
     |
     */
 
-    'table' => env('MODEL_PREFERENCES_TABLE', 'preferences'),
+    'default' => env('MODEL_PREFERENCES_DRIVER', 'shared'),
 
     /*
     |--------------------------------------------------------------------------
-    | Model Configuration
+    | Preference Stores
     |--------------------------------------------------------------------------
     |
-    | Specify the model classes to use for preferences. You can extend
-    | the default models to add custom functionality if needed.
+    | Here, you can define all the preference stores for your application
+    | along with their respective drivers.
     |
     */
 
-    'models' => [
+    'stores' => [
 
-        'preference' => Preference::class,
+        'column' => [
+            'driver' => 'column',
+            'name' => env('MODEL_PREFERENCES_COLUMN_NAME', 'preferences'),
+        ],
+
+        'table' => [
+            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
+            'driver' => 'table',
+        ],
+
+        'shared' => [
+            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
+            'driver' => 'shared',
+            'table' => env('MODEL_PREFERENCES_TABLE', 'preferences'),
+        ],
 
     ],
 
