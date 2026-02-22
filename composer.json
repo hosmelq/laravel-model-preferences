@@ -21,9 +21,9 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/contracts": "^11.0 || ^12.0",
-        "illuminate/database": "^11.0 || ^12.0",
-        "illuminate/support": "^11.0 || ^12.0",
+        "illuminate/contracts": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/database": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0",
         "spatie/laravel-package-tools": "^1.92",
         "thecodingmachine/safe": "^3.3"
     },
@@ -31,10 +31,9 @@
         "ergebnis/composer-normalize": "^2.49",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.27",
-        "orchestra/pest-plugin-testbench": "^3.2",
-        "orchestra/testbench": "^9.0 || ^10.0",
-        "pestphp/pest": "^3.8",
-        "pestphp/pest-plugin-laravel": "^3.2",
+        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+        "pestphp/pest": "^3.8 || ^4.0",
+        "pestphp/pest-plugin-laravel": "^3.2 || ^4.1",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
@@ -46,7 +45,7 @@
         "ticketswap/phpstan-error-formatter": "^1.2",
         "tomasvotruba/type-coverage": "^2.1"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
