@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences\Support;
 
+use function HosmelQ\ModelPreferences\enum_value;
+
+use HosmelQ\ModelPreferences\Enums\StoreDriver;
+
 class PreferencesConfig
 {
     /**
@@ -104,9 +108,9 @@ class PreferencesConfig
     /**
      * Set the configured driver name.
      */
-    public function withDriver(string $driver): self
+    public function withDriver(StoreDriver|string $driver): self
     {
-        $this->driver = $driver;
+        $this->driver = (string) enum_value($driver);
 
         return $this;
     }

@@ -35,7 +35,8 @@ it('creates built-in drivers', function (): void {
 
     expect($manager)
         ->driver('column')->toBeInstanceOf(PreferencesStore::class)
-        ->driver('shared')->toBeInstanceOf(PreferencesStore::class);
+        ->driver('shared')->toBeInstanceOf(PreferencesStore::class)
+        ->driver('table')->toBeInstanceOf(PreferencesStore::class);
 });
 
 it('registers custom drivers', function (): void {

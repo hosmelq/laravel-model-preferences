@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use HosmelQ\ModelPreferences\Enums\StoreDriver;
+
 return [
 
     /*
@@ -18,7 +20,7 @@ return [
     |
     */
 
-    'default' => env('MODEL_PREFERENCES_DRIVER', 'shared'),
+    'default' => env('MODEL_PREFERENCES_DRIVER', StoreDriver::Shared->value),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,19 +35,19 @@ return [
     'stores' => [
 
         'column' => [
-            'driver' => 'column',
+            'driver' => StoreDriver::Column->value,
             'name' => env('MODEL_PREFERENCES_COLUMN_NAME', 'preferences'),
-        ],
-
-        'table' => [
-            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
-            'driver' => 'table',
         ],
 
         'shared' => [
             'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
-            'driver' => 'shared',
+            'driver' => StoreDriver::Shared->value,
             'table' => env('MODEL_PREFERENCES_TABLE', 'preferences'),
+        ],
+
+        'table' => [
+            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
+            'driver' => StoreDriver::Table->value,
         ],
 
     ],

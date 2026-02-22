@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HosmelQ\ModelPreferences\Models\Concerns;
 
 use HosmelQ\ModelPreferences\Contracts\HasPreferences;
+use HosmelQ\ModelPreferences\Enums\StoreDriver;
 use HosmelQ\ModelPreferences\Facades\Preferences;
 use HosmelQ\ModelPreferences\PendingPreferenceInteraction;
 use HosmelQ\ModelPreferences\Support\PreferencesConfig as ModelPreferencesConfig;
@@ -39,7 +40,11 @@ trait InteractsWithPreferences
     protected static function bootInteractsWithPreferences(): void
     {
         static::deleted(function (HasPreferences $model): void {
-            if (in_array($model->preferencesConfig()->getDriver(), ['shared', 'table'], true)) {
+            if (in_array(
+                $model->preferencesConfig()->getDriver(),
+                [StoreDriver::Shared->value, StoreDriver::Table->value],
+                true
+            )) {
                 $model->preferences()->clear();
             }
         });
@@ -50,7 +55,7 @@ trait InteractsWithPreferences
      */
     protected function initializeInteractsWithPreferences(): void
     {
-        if ($this->preferencesConfig()->getDriver() === 'column') {
+        if ($this->preferencesConfig()->getDriver() === StoreDriver::Column->value) {
             $column = $this->preferencesConfig()->getColumn();
 
             if (is_string($column) && $column !== '') {

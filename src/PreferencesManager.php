@@ -8,6 +8,7 @@ use HosmelQ\ModelPreferences\Contracts\HasPreferences;
 use HosmelQ\ModelPreferences\Drivers\ColumnDriver;
 use HosmelQ\ModelPreferences\Drivers\SharedTableDriver;
 use HosmelQ\ModelPreferences\Drivers\TableDriver;
+use HosmelQ\ModelPreferences\Enums\StoreDriver;
 use HosmelQ\ModelPreferences\Support\Config as PreferencesConfig;
 use Illuminate\Support\Manager;
 
@@ -37,7 +38,7 @@ class PreferencesManager extends Manager
      */
     protected function createColumnDriver(): PreferencesStore
     {
-        return new PreferencesStore('column', new ColumnDriver());
+        return new PreferencesStore(StoreDriver::Column->value, new ColumnDriver());
     }
 
     /**
@@ -45,7 +46,7 @@ class PreferencesManager extends Manager
      */
     protected function createSharedDriver(): PreferencesStore
     {
-        return new PreferencesStore('shared', new SharedTableDriver(
+        return new PreferencesStore(StoreDriver::Shared->value, new SharedTableDriver(
             $this->container->make('db')
         ));
     }
@@ -55,7 +56,7 @@ class PreferencesManager extends Manager
      */
     protected function createTableDriver(): PreferencesStore
     {
-        return new PreferencesStore('table', new TableDriver(
+        return new PreferencesStore(StoreDriver::Table->value, new TableDriver(
             $this->container->make('db')
         ));
     }
