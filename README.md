@@ -1,110 +1,14 @@
 # Laravel Model Preferences
 
-Laravel Model Preferences provides a simple, fluent API for storing per-model preferences. You may
-store preferences in a JSON column or database tables and define defaults and validation rules per
-model.
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/hosmelq/laravel-model-preferences/ci.yml?branch=main&label=tests&style=flat-square)](https://github.com/hosmelq/laravel-model-preferences/actions/workflows/ci.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/hosmelq/laravel-model-preferences.svg?style=flat-square)](https://packagist.org/packages/hosmelq/laravel-model-preferences)
+[![Total Downloads](https://img.shields.io/packagist/dt/hosmelq/laravel-model-preferences.svg?style=flat-square)](https://packagist.org/packages/hosmelq/laravel-model-preferences)
 
-## Table of Contents
+This package provides a simple API for storing preferences on Eloquent models.
 
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [Configuration](#configuration)
-  - [Default Store](#default-store)
-  - [Store Configuration](#store-configuration)
-  - [Environment Variables](#environment-variables)
-- [Defining Preferences](#defining-preferences)
-  - [The InteractsWithPreferences Trait](#the-interactswithpreferences-trait)
-  - [The preferencesConfig Method](#the-preferencesconfig-method)
-  - [Defaults](#defaults)
-  - [Validation Rules](#validation-rules)
-- [Using Preferences](#using-preferences)
-  - [Obtaining a Preferences Instance](#obtaining-a-preferences-instance)
-  - [Retrieving Preferences](#retrieving-preferences)
-  - [Storing Preferences](#storing-preferences)
-  - [Checking for Presence](#checking-for-presence)
-  - [Retrieving All Preferences](#retrieving-all-preferences)
-  - [Defaults & Missing Values](#defaults--missing-values)
-  - [Deleting Preferences](#deleting-preferences)
-- [Enum Keys](#enum-keys)
-- [Preference Stores](#preference-stores)
-  - [Column Driver (JSON Column)](#column-driver-json-column)
-  - [Shared Table Driver (Polymorphic)](#shared-table-driver-polymorphic)
-  - [Per-Model Table Driver](#per-model-table-driver)
-  - [Custom Tables & the Artisan Generator](#custom-tables--the-artisan-generator)
-- [Adding Custom Preference Drivers](#adding-custom-preference-drivers)
-  - [Implementing a Driver](#implementing-a-driver)
-  - [Registering a Driver](#registering-a-driver)
-- [Model Cleanup](#model-cleanup)
-- [Testing](#testing)
-- [Changelog](#changelog)
-- [Contributing](#contributing)
-- [License](#license)
+You can define defaults and validation rules, and choose where preferences are stored.
 
-## Introduction
-
-Model preferences are small settings that live alongside a model, such as themes, notification
-options, or feature toggles. This package provides a clean API to read and write preferences with
-sensible defaults and validation.
-
-## Installation
-
-First, install the package via Composer:
-
-```bash
-composer require hosmelq/laravel-model-preferences
-```
-
-Next, publish the configuration and migration files:
-
-```bash
-php artisan model-preferences:install
-```
-
-If you prefer, you may publish the assets manually:
-
-```bash
-php artisan vendor:publish --tag="model-preferences-config"
-php artisan vendor:publish --tag="model-preferences-migrations"
-```
-
-Finally, run your migrations if you are using the shared or table stores:
-
-```bash
-php artisan migrate
-```
-
-## Configuration
-
-After publishing the package assets, the configuration file will be located at
-`config/model-preferences.php`. This configuration file allows you to specify the default store
-and configure each store.
-
-### Default Store
-
-You may specify the default preference store using the `model-preferences.default` configuration
-value or the `MODEL_PREFERENCES_DRIVER` environment variable. Supported drivers are `column`,
-`shared`, and `table`.
-
-### Store Configuration
-
-Each store has its own configuration. For example, you may configure the JSON column name for the
-`column` driver or the database connection and table name for the shared and table drivers.
-
-### Environment Variables
-
-The following environment variables are supported:
-
-- `MODEL_PREFERENCES_DRIVER` (default: `shared`)
-- `MODEL_PREFERENCES_COLUMN_NAME` (default: `preferences`)
-- `MODEL_PREFERENCES_TABLE` (default: `preferences`)
-- `MODEL_PREFERENCES_DB_CONNECTION` (default: `DB_CONNECTION`)
-
-## Defining Preferences
-
-### The InteractsWithPreferences Trait
-
-To define preferences on a model, add the `InteractsWithPreferences` trait and implement the
-`HasPreferences` contract:
+Here's a quick example:
 
 ```php
 use HosmelQ\ModelPreferences\Contracts\HasPreferences;
@@ -118,328 +22,41 @@ class User extends Model implements HasPreferences
 
     public function preferencesConfig(): PreferencesConfig
     {
-        return PreferencesConfig::configure();
+        return PreferencesConfig::configure()->withDefaults([
+            'theme' => 'system',
+        ]);
     }
 }
+
+$user = User::query()->first();
+
+$user->preferences()->set('theme', 'dark');
+
+$theme = $user->preferences()->get('theme');
 ```
 
-### The preferencesConfig Method
-
-The `preferencesConfig` method allows you to define defaults, validation rules, and the driver
-for a given model:
+You can customize defaults, validation rules, and storage options:
 
 ```php
-use HosmelQ\ModelPreferences\Support\PreferencesConfig as ModelPreferencesConfig;
-use Illuminate\Validation\Rule;
+use HosmelQ\ModelPreferences\Support\PreferencesConfig;
 
-public function preferencesConfig(): ModelPreferencesConfig
+public function preferencesConfig(): PreferencesConfig
 {
-    return ModelPreferencesConfig::configure()
+    return PreferencesConfig::configure()
+        ->withColumn('settings')
         ->withDefaults([
-            'notifications' => true,
             'theme' => 'system',
         ])
+        ->withDriver('column')
         ->withRules([
-            'notifications' => ['boolean'],
-            'theme' => [Rule::in(['dark', 'light', 'system'])],
+            'theme' => ['in:light,dark,system'],
         ]);
 }
 ```
 
-### Defaults
+## Documentation
 
-Defaults may be defined per model using `withDefaults`. These values will be returned when the
-preference key is not present in the store:
-
-```php
-use HosmelQ\ModelPreferences\Support\PreferencesConfig;
-
-return PreferencesConfig::configure()
-    ->withDefaults([
-        'theme' => 'system',
-    ]);
-```
-
-### Validation Rules
-
-You may validate preferences using Laravel's validation rules. Rules are evaluated when calling
-`set`, and a `PreferenceValidationException` will be thrown if validation fails:
-
-```php
-use App\Models\User;
-use HosmelQ\ModelPreferences\Exceptions\PreferenceValidationException;
-
-$user = User::query()->firstOrFail();
-
-try {
-    $user->preferences()->set('theme', 'invalid');
-} catch (PreferenceValidationException $e) {
-    $errors = $e->errors();
-}
-```
-
-## Using Preferences
-
-### Obtaining a Preferences Instance
-
-Call the `preferences` method on your model to obtain a scoped preferences instance:
-
-```php
-use App\Models\User;
-
-$user = User::query()->firstOrFail();
-
-$preferences = $user->preferences();
-```
-
-### Retrieving Preferences
-
-Use `get` to retrieve a single preference value. You may pass a default value or a closure that
-will be evaluated lazily. To retrieve multiple preferences at once, use `getMultiple`:
-
-```php
-use App\Models\User;
-
-$user = User::query()->firstOrFail();
-
-$theme = $user->preferences()->get('theme');
-$timezone = $user->preferences()->get('timezone', 'UTC');
-$locale = $user->preferences()->get('locale', fn () => app()->getLocale());
-$values = $user->preferences()->getMultiple(['theme', 'timezone']);
-```
-
-### Storing Preferences
-
-Use `set` to store a preference value or `setMultiple` to store multiple values:
-
-```php
-use App\Models\User;
-
-$user = User::query()->firstOrFail();
-
-$user->preferences()->set('theme', 'dark');
-$user->preferences()->setMultiple([
-    'theme' => 'dark',
-    'locale' => 'en',
-]);
-```
-
-### Checking for Presence
-
-Use `has` to determine if a preference key exists. You may also use `missing` to check the
-opposite:
-
-```php
-use App\Models\User;
-
-$user = User::query()->firstOrFail();
-
-if ($user->preferences()->has('theme')) {
-    // ...
-}
-
-if ($user->preferences()->missing('timezone')) {
-    // ...
-}
-```
-
-### Retrieving All Preferences
-
-Use `all` to retrieve all stored preferences:
-
-```php
-use App\Models\User;
-
-$user = User::query()->firstOrFail();
-
-$all = $user->preferences()->all();
-```
-
-### Defaults & Missing Values
-
-Preference lookup follows these rules:
-
-- If the preference exists (even if its value is `null`), `get` returns that value.
-- If the preference does not exist and a model default is configured, the default is returned.
-- If the preference does not exist and a default is passed to `get`, that default is returned.
-- Otherwise, `null` is returned.
-
-### Deleting Preferences
-
-Use `delete` to remove a single preference, `deleteMultiple` for batches, and `clear` to remove all
-preferences:
-
-```php
-use App\Models\User;
-
-$user = User::query()->firstOrFail();
-
-$user->preferences()->delete('theme');
-$user->preferences()->deleteMultiple(['theme', 'locale']);
-$user->preferences()->clear();
-```
-
-## Enum Keys
-
-Preference keys may be strings, backed enums, or unit enums. Backed enums use their backed value,
-while unit enums use their name:
-
-```php
-use App\Models\User;
-
-enum UserPreference: string
-{
-    case Theme = 'theme';
-}
-
-$user = User::query()->firstOrFail();
-
-$user->preferences()->set(UserPreference::Theme, 'dark');
-```
-
-## Preference Stores
-
-You may select a store globally via configuration or per model using `withDriver`.
-
-### Column Driver (JSON Column)
-
-The column driver stores all preferences in a single JSON column on the model's table. You may
-configure the column name via `withColumn` or the `model-preferences.stores.column.name` setting.
-When using this driver, the `InteractsWithPreferences` trait automatically adds a JSON cast for
-the configured column.
-
-Example migration column:
-
-```php
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-Schema::table('users', function (Blueprint $table): void {
-    $table->json('preferences')->nullable();
-});
-```
-
-### Shared Table Driver (Polymorphic)
-
-The shared driver stores preferences in a single table using a polymorphic relation. The
-published migration creates a `preferences` table with `preferable_type`, `preferable_id`, `key`,
-and `value` columns.
-
-### Per-Model Table Driver
-
-The table driver stores preferences in a dedicated table per model. When using this driver, you
-must configure the table name in `preferencesConfig`:
-
-```php
-use HosmelQ\ModelPreferences\Support\PreferencesConfig;
-
-return PreferencesConfig::configure()
-    ->withDriver('table')
-    ->withTable('users_preferences');
-```
-
-### Custom Tables & the Artisan Generator
-
-You may generate a preferences table migration using the Artisan command:
-
-```bash
-php artisan model-preferences:table users_preferences
-```
-
-This stub creates a table with `model_id`, `key`, and `value` columns and a unique index on
-`model_id` and `key`.
-
-## Adding Custom Preference Drivers
-
-### Implementing a Driver
-
-To add your own driver, implement the `PreferenceDriver` contract. If you need to distinguish
-between missing values and `null`, implement `PresenceAwarePreferenceDriver` and return a
-`PreferenceRead` instance from `getWithPresence`.
-
-```php
-use HosmelQ\ModelPreferences\Contracts\HasPreferences;
-use HosmelQ\ModelPreferences\Contracts\PreferenceDriver;
-
-class CustomDriver implements PreferenceDriver
-{
-    public function all(HasPreferences $model): array
-    {
-        return [];
-    }
-
-    public function clear(HasPreferences $model): void
-    {
-        // ...
-    }
-
-    public function delete(HasPreferences $model, string $key): void
-    {
-        // ...
-    }
-
-    public function deleteMultiple(HasPreferences $model, array $keys): void
-    {
-        // ...
-    }
-
-    public function get(HasPreferences $model, string $key): mixed
-    {
-        return null;
-    }
-
-    public function getMultiple(HasPreferences $model, array $keys): array
-    {
-        return [];
-    }
-
-    public function has(HasPreferences $model, string $key): bool
-    {
-        return false;
-    }
-
-    public function missing(HasPreferences $model, string $key): bool
-    {
-        return true;
-    }
-
-    public function set(HasPreferences $model, string $key, mixed $value): void
-    {
-        // ...
-    }
-
-    public function setMultiple(HasPreferences $model, array $values): void
-    {
-        // ...
-    }
-}
-```
-
-### Registering a Driver
-
-Register your driver via the preferences manager, then configure your model to use it:
-
-```php
-use App\Preferences\CustomDriver;
-use HosmelQ\ModelPreferences\PreferencesManager;
-use HosmelQ\ModelPreferences\PreferencesStore;
-
-app(PreferencesManager::class)->extend('custom', function () {
-    return new PreferencesStore('custom', new CustomDriver());
-});
-```
-
-```php
-use HosmelQ\ModelPreferences\Support\PreferencesConfig;
-
-return PreferencesConfig::configure()
-    ->withDriver('custom');
-```
-
-## Model Cleanup
-
-When using the shared or table drivers, the `InteractsWithPreferences` trait automatically
-removes stored preferences when the model is deleted.
+All documentation is available [on the documentation site](https://hosmelq.com/docs/laravel-model-preferences).
 
 ## Testing
 
@@ -447,13 +64,26 @@ removes stored preferences when the model is deleted.
 composer test
 ```
 
+## Support
+
+If this package is useful in your project, consider starring the repository and sharing feedback or improvements.
+
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 
-Pull requests are welcome. Please run the test suite before submitting changes.
+Contributions are welcome. Please open a PR with tests and clear context for the change.
+
+## Security
+
+If you discover any security related issues, please email hosmelq@gmail.com instead of using the issue tracker.
+
+## Credits
+
+- [Hosmel Quintana](https://github.com/hosmelq)
+- [All Contributors](https://github.com/hosmelq/laravel-model-preferences/contributors)
 
 ## License
 
