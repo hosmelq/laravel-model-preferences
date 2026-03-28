@@ -234,6 +234,8 @@ class TableDriver implements PresenceAwarePreferenceDriver
 
     /**
      * Get the owner key column name for table-based preferences.
+     *
+     * @return non-empty-string
      */
     protected function ownerKey(): string
     {
