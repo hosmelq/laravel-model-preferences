@@ -19,13 +19,16 @@
     ],
     "homepage": "https://github.com/hosmelq/laravel-model-preferences",
     "support": {
-        "docs": "https://github.com/hosmelq/laravel-model-preferences#readme"
+        "docs": "https://hosmelq.com/docs/laravel-model-preferences"
     },
     "require": {
         "php": "^8.4",
+        "illuminate/console": "^13.42.0",
         "illuminate/contracts": "^13.42.0",
         "illuminate/database": "^13.42.0",
+        "illuminate/filesystem": "^13.42.0",
         "illuminate/support": "^13.42.0",
+        "illuminate/validation": "^13.42.0",
         "spatie/laravel-package-tools": "^1.93.3",
         "thecodingmachine/safe": "^3.4.0"
     },
@@ -45,14 +48,12 @@
     "autoload": {
         "psr-4": {
             "HosmelQ\\ModelPreferences\\": "src/"
-        },
-        "files": [
-            "src/functions.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "HosmelQ\\ModelPreferences\\Tests\\": "tests/"
+            "HosmelQ\\ModelPreferences\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/"
         }
     },
     "config": {

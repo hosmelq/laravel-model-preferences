@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 - Require PHP 8.4 or newer and Laravel 13.
+- Rebuild around `PreferenceRepository` and a smaller `PreferenceDriver` contract.
+- Add per-model caching, eager loading (`loadPreferences()`), and single-query upserts.
+- Add casts, strict mode, `wherePreference()`, events, and `Preferences::fake()`.
+- Lock `column` store writes to prevent overwrites, and keep preferences on soft-deleted models until `forceDelete()`.
+- Update `model-preferences:table` to accept a model class and add a cascading foreign key.
+
+See [docs/upgrading.md](docs/upgrading.md) for upgrade instructions.
 
 ## v1.1.0 - 2026-03-28
 

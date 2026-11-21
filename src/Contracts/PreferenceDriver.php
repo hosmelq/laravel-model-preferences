@@ -4,65 +4,57 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences\Contracts;
 
+use HosmelQ\ModelPreferences\Support\PreferencesConfig;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
 interface PreferenceDriver
 {
     /**
-     * Get all preferences for a model.
-     *
      * @return array<string, mixed>
      */
-    public function all(HasPreferences $model): array;
+    public function all(HasPreferences&Model $model, PreferencesConfig $config): array;
 
     /**
-     * Delete all preferences for a model.
+     * @return list<string>
      */
-    public function clear(HasPreferences $model): void;
+    public function clear(HasPreferences&Model $model, PreferencesConfig $config): array;
 
     /**
-     * Delete a preference for a model.
+     * @param list<string> $keys
      */
-    public function delete(HasPreferences $model, string $key): void;
+    public function delete(
+        HasPreferences&Model $model,
+        PreferencesConfig $config,
+        array $keys,
+    ): void;
 
     /**
-     * Delete multiple preferences for a model.
-     *
-     * @param array<int, string> $keys
+     * @param non-empty-list<HasPreferences&Model> $models
      */
-    public function deleteMultiple(HasPreferences $model, array $keys): void;
+    public function load(array $models, PreferencesConfig $config): void;
 
     /**
-     * Get a preference value for a model.
-     */
-    public function get(HasPreferences $model, string $key): mixed;
-
-    /**
-     * Get multiple preference values for a model.
-     *
-     * @param array<int, string> $keys
-     *
-     * @return array<string, mixed>
-     */
-    public function getMultiple(HasPreferences $model, array $keys): array;
-
-    /**
-     * Check if a preference exists for a model.
-     */
-    public function has(HasPreferences $model, string $key): bool;
-
-    /**
-     * Determine if a preference is missing for a model.
-     */
-    public function missing(HasPreferences $model, string $key): bool;
-
-    /**
-     * Set a preference value for a model.
-     */
-    public function set(HasPreferences $model, string $key, mixed $value): void;
-
-    /**
-     * Set multiple preference values for a model.
-     *
      * @param array<string, mixed> $values
      */
-    public function setMultiple(HasPreferences $model, array $values): void;
+    public function set(
+        HasPreferences&Model $model,
+        PreferencesConfig $config,
+        array $values,
+    ): void;
+
+    /**
+     * @param Builder<*> $query
+     */
+    public function whereMissing(Builder $query, PreferencesConfig $config, string $key): void;
+
+    /**
+     * @param Builder<*> $query
+     */
+    public function whereStored(
+        Builder $query,
+        PreferencesConfig $config,
+        string $key,
+        mixed $value,
+    ): void;
 }

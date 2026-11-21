@@ -6,58 +6,48 @@ namespace HosmelQ\ModelPreferences\Models\Concerns;
 
 use HosmelQ\ModelPreferences\Contracts\HasPreferences;
 use HosmelQ\ModelPreferences\Facades\Preferences;
-use HosmelQ\ModelPreferences\PendingPreferenceInteraction;
-use HosmelQ\ModelPreferences\Support\PreferencesConfig as ModelPreferencesConfig;
+use HosmelQ\ModelPreferences\PreferenceRepository;
+use HosmelQ\ModelPreferences\Support\PreferencesConfig;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use UnitEnum;
 
 /**
- * @mixin Model
+ * @phpstan-require-extends Model
+ *
+ * @phpstan-require-implements HasPreferences
  */
 trait InteractsWithPreferences
 {
-    /**
-     * Get the preferences scoped interaction.
-     *
-     * @return PendingPreferenceInteraction<static>
-     */
-    public function preferences(): PendingPreferenceInteraction
+    public function preferences(): PreferenceRepository
     {
-        return Preferences::driver($this->preferencesConfig()->getDriver())->for($this);
+        return Preferences::for($this);
+    }
+
+    public function preferencesConfig(): PreferencesConfig
+    {
+        return PreferencesConfig::configure();
     }
 
     /**
-     * Build the preferences configuration for the model.
+     * @param Builder<static> $query
      */
-    public function preferencesConfig(): ModelPreferencesConfig
+    public function scopeWherePreference(Builder $query, string|UnitEnum $key, mixed $value): void
     {
-        return ModelPreferencesConfig::configure();
+        $this->preferences()->whereEquals($query, $key, $value);
     }
 
-    /**
-     * Boot the trait.
-     */
     protected static function bootInteractsWithPreferences(): void
     {
-        static::deleted(function (HasPreferences $model): void {
-            if (in_array($model->preferencesConfig()->getDriver(), ['shared', 'table'], true)) {
-                $model->preferences()->clear();
-            }
+        $event = in_array(SoftDeletes::class, class_uses_recursive(static::class), true)
+            ? 'forceDeleted'
+            : 'deleted';
+
+        static::registerModelEvent($event, function (HasPreferences&Model $model): void {
+            $config = Preferences::config($model);
+
+            Preferences::driverFor($config)->clear($model, $config);
         });
-    }
-
-    /**
-     * Initialize the trait.
-     */
-    protected function initializeInteractsWithPreferences(): void
-    {
-        if ($this->preferencesConfig()->getDriver() === 'column') {
-            $column = $this->preferencesConfig()->getColumn();
-
-            if (is_string($column) && $column !== '') {
-                $this->mergeCasts([
-                    $column => 'json',
-                ]);
-            }
-        }
     }
 }
