@@ -10,7 +10,6 @@ class UserWithCustomDriver extends User
 {
     public function preferencesConfig(): ModelPreferencesConfig
     {
-        return ModelPreferencesConfig::configure()
-            ->withDriver('custom');
+        return ModelPreferencesConfig::configure()->withDriver('custom');
     }
 }

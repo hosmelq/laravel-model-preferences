@@ -10,6 +10,7 @@ use HosmelQ\ModelPreferences\Drivers\SharedTableDriver;
 use HosmelQ\ModelPreferences\Drivers\TableDriver;
 use HosmelQ\ModelPreferences\Support\Config as PreferencesConfig;
 use Illuminate\Support\Manager;
+use Override;
 
 class PreferencesManager extends Manager
 {
@@ -27,6 +28,7 @@ class PreferencesManager extends Manager
     /**
      * Get the default store name.
      */
+    #[Override]
     public function getDefaultDriver(): string
     {
         return PreferencesConfig::default();
@@ -46,7 +48,7 @@ class PreferencesManager extends Manager
     protected function createSharedDriver(): PreferencesStore
     {
         return new PreferencesStore('shared', new SharedTableDriver(
-            $this->container->make('db')
+            $this->container->make('db'),
         ));
     }
 
@@ -56,7 +58,7 @@ class PreferencesManager extends Manager
     protected function createTableDriver(): PreferencesStore
     {
         return new PreferencesStore('table', new TableDriver(
-            $this->container->make('db')
+            $this->container->make('db'),
         ));
     }
 }

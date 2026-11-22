@@ -81,9 +81,7 @@ it('returns a preference value for the column driver', function (): void {
 it('returns defaults for unset preferences', function (): void {
     $user = User::create();
 
-    expect($user->preferences())
-        ->get('notifications')->toBeTrue()
-        ->get('theme')->toBe('system');
+    expect($user->preferences())->get('notifications')->toBeTrue()->get('theme')->toBe('system');
 });
 
 it('returns a custom default when preference does not exist', function (): void {
@@ -181,10 +179,10 @@ it('validates preferences against rules', function (): void {
 
 it('scopes preferences per model', function (): void {
     $user = User::create();
-
     $other = OtherUserPreferencesModel::create();
 
     $other->preferences()->set('max_members', 50);
+
     $user->preferences()->set('theme', 'light');
 
     expect($other->preferences())
@@ -200,8 +198,7 @@ it('accepts enum keys', function (): void {
 
     $user->preferences()->set(UserPreference::Theme, 'dark');
 
-    expect($user->preferences()->all())
-        ->theme->toBe('dark');
+    expect($user->preferences()->all())->theme->toBe('dark');
 });
 
 it('stores multiple preference values', function (): void {
@@ -212,6 +209,5 @@ it('stores multiple preference values', function (): void {
         'theme' => 'dark',
     ]);
 
-    expect($user->preferences()->all())
-        ->toBe(['notifications' => false, 'theme' => 'dark']);
+    expect($user->preferences()->all())->toBe(['notifications' => false, 'theme' => 'dark']);
 });

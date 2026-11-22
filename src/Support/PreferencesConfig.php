@@ -20,9 +20,8 @@ class PreferencesConfig
          * @var array<string, mixed>
          */
         public array $rules = [],
-        public null|string $table = null
-    ) {
-    }
+        public null|string $table = null,
+    ) {}
 
     /**
      * Start configuring model preferences.
@@ -31,7 +30,7 @@ class PreferencesConfig
     {
         return new self(
             column: Config::storesColumnName(),
-            driver: Config::default()
+            driver: Config::default(),
         );
     }
 

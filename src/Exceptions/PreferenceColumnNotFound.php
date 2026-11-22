@@ -16,7 +16,7 @@ class PreferenceColumnNotFound extends InvalidArgumentException
     {
         return new self(sprintf(
             'The preferences column is not configured for the [%s] table.',
-            $model->getTable()
+            $model->getTable(),
         ));
     }
 }

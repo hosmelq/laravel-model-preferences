@@ -10,7 +10,6 @@ class UserWithInvalidColumn extends User
 {
     public function preferencesConfig(): ModelPreferencesConfig
     {
-        return ModelPreferencesConfig::configure()
-            ->withColumn('');
+        return ModelPreferencesConfig::configure()->withColumn('');
     }
 }

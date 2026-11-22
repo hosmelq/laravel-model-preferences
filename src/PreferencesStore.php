@@ -14,9 +14,7 @@ class PreferencesStore
     /**
      * Create a new preferences store instance.
      */
-    public function __construct(protected string $name, protected PreferenceDriver $driver)
-    {
-    }
+    public function __construct(protected string $name, protected PreferenceDriver $driver) {}
 
     /**
      * Create a scoped instance for a model.
@@ -24,11 +22,15 @@ class PreferencesStore
     public function for(HasPreferences $model): PendingPreferenceInteraction
     {
         if (! in_array(InteractsWithPreferences::class, class_uses_recursive($model), true)) {
-            throw new InvalidArgumentException('The model must use the InteractsWithPreferences trait.');
+            throw new InvalidArgumentException(
+                'The model must use the InteractsWithPreferences trait.',
+            );
         }
 
         if ($model->preferencesConfig()->getDriver() !== $this->name) {
-            throw new InvalidArgumentException('The model preference driver does not match the selected driver.');
+            throw new InvalidArgumentException(
+                'The model preference driver does not match the selected driver.',
+            );
         }
 
         return new PendingPreferenceInteraction($this->driver, $model);

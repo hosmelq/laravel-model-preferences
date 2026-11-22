@@ -15,6 +15,7 @@ use HosmelQ\ModelPreferences\Support\PreferenceRead;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Query\Builder;
+use Override;
 use Safe\Exceptions\JsonException;
 
 class TableDriver implements PresenceAwarePreferenceDriver
@@ -22,15 +23,14 @@ class TableDriver implements PresenceAwarePreferenceDriver
     /**
      * Create a new table driver instance.
      */
-    public function __construct(protected DatabaseManager $db)
-    {
-    }
+    public function __construct(protected DatabaseManager $db) {}
 
     /**
      * Get all preferences for a model.
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function all(HasPreferences $model): array
     {
         /** @var array<string, mixed> */
@@ -52,16 +52,16 @@ class TableDriver implements PresenceAwarePreferenceDriver
     /**
      * Delete all preferences for a model.
      */
+    #[Override]
     public function clear(HasPreferences $model): void
     {
-        $this->newQuery($model)
-            ->where($this->ownerKey(), $model->getKey())
-            ->delete();
+        $this->newQuery($model)->where($this->ownerKey(), $model->getKey())->delete();
     }
 
     /**
      * Delete a preference for a model.
      */
+    #[Override]
     public function delete(HasPreferences $model, string $key): void
     {
         $this->newQuery($model)
@@ -75,6 +75,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @param array<int, string> $keys
      */
+    #[Override]
     public function deleteMultiple(HasPreferences $model, array $keys): void
     {
         $this->newQuery($model)
@@ -88,6 +89,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @throws JsonException
      */
+    #[Override]
     public function get(HasPreferences $model, string $key): mixed
     {
         return $this->getWithPresence($model, $key)->value;
@@ -100,6 +102,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function getMultiple(HasPreferences $model, array $keys): array
     {
         /** @var array<string, mixed> */
@@ -124,6 +127,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @throws JsonException
      */
+    #[Override]
     public function getWithPresence(HasPreferences $model, string $key): PreferenceRead
     {
         $row = $this->newQuery($model)
@@ -151,6 +155,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @throws JsonException
      */
+    #[Override]
     public function has(HasPreferences $model, string $key): bool
     {
         return $this->newQuery($model)
@@ -162,6 +167,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
     /**
      * Determine if a preference is missing for a model.
      */
+    #[Override]
     public function missing(HasPreferences $model, string $key): bool
     {
         return ! $this->has($model, $key);
@@ -172,6 +178,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @throws JsonException
      */
+    #[Override]
     public function set(HasPreferences $model, string $key, mixed $value): void
     {
         $encoded = json_encode($value);
@@ -191,6 +198,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
      *
      * @throws JsonException
      */
+    #[Override]
     public function setMultiple(HasPreferences $model, array $values): void
     {
         if ($values === []) {
@@ -210,7 +218,7 @@ class TableDriver implements PresenceAwarePreferenceDriver
         $this->newQuery($model)->upsert(
             $rows,
             [$this->ownerKey(), 'key'],
-            ['value']
+            ['value'],
         );
     }
 

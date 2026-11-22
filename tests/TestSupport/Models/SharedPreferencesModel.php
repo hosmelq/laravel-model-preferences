@@ -17,7 +17,6 @@ class SharedPreferencesModel extends Model implements HasPreferences
 
     public function preferencesConfig(): PreferencesConfig
     {
-        return PreferencesConfig::configure()
-            ->withDriver('shared');
+        return PreferencesConfig::configure()->withDriver('shared');
     }
 }

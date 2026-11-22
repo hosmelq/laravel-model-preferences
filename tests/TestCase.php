@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences\Tests;
 
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
@@ -19,7 +18,7 @@ abstract class TestCase extends OrchestraTestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], function (mixed $config): void {
             $config->set('model-preferences.default', 'shared');
             $config->set('model-preferences.stores.column.name', 'preferences');
             $config->set('model-preferences.stores.table.connection');

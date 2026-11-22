@@ -17,9 +17,10 @@ class PendingPreferenceInteraction
     /**
      * Create a new pending preference interaction instance.
      */
-    public function __construct(protected PreferenceDriver $driver, protected HasPreferences $model)
-    {
-    }
+    public function __construct(
+        protected PreferenceDriver $driver,
+        protected HasPreferences $model,
+    ) {}
 
     /**
      * Get all preferences.

@@ -7,11 +7,10 @@ use function Pest\Laravel\artisan;
 use HosmelQ\ModelPreferences\Commands\MakePreferencesTable;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
-uses(InteractsWithPublishedFiles::class);
+pest()->use(InteractsWithPublishedFiles::class);
 
 it('creates a migration file with the correct name', function (): void {
-    artisan(MakePreferencesTable::class, ['name' => 'test_preferences'])
-        ->assertSuccessful();
+    artisan(MakePreferencesTable::class, ['name' => 'test_preferences'])->assertSuccessful();
 
     $this->assertMigrationFileExists('*_create_test_preferences_table.php');
 });
@@ -23,8 +22,7 @@ it('displays success message with migration name', function (): void {
 });
 
 it('generates migration with all required columns', function (): void {
-    artisan(MakePreferencesTable::class, ['name' => 'test_preferences'])
-        ->assertSuccessful();
+    artisan(MakePreferencesTable::class, ['name' => 'test_preferences'])->assertSuccessful();
 
     $this->assertMigrationFileContains([
         '$table->id()',
@@ -36,8 +34,7 @@ it('generates migration with all required columns', function (): void {
 });
 
 it('generates migration with correct index', function (): void {
-    artisan(MakePreferencesTable::class, ['name' => 'test_preferences'])
-        ->assertSuccessful();
+    artisan(MakePreferencesTable::class, ['name' => 'test_preferences'])->assertSuccessful();
 
     $this->assertMigrationFileContains([
         "\$table->unique(['model_id', 'key'])",

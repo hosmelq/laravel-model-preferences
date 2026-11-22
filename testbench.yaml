@@ -6,6 +6,4 @@ providers:
   - HosmelQ\ModelPreferences\ModelPreferencesServiceProvider
 
 workbench:
-  config: true
-
   install: false

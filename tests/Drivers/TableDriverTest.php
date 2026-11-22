@@ -18,7 +18,7 @@ it('returns empty results when no preferences exist', function (): void {
     $driver = new TableDriver(resolve('db'));
     $user = User::create();
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('returns null values stored in the table', function (): void {
@@ -47,7 +47,7 @@ it('removes all preferences', function (): void {
 
     $driver->clear($user);
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('removes a preference', function (): void {
@@ -75,7 +75,7 @@ it('removes multiple preferences', function (): void {
 
     $driver->deleteMultiple($user, ['theme', 'notifications']);
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('returns a preference value', function (): void {
@@ -118,11 +118,9 @@ it('returns null values for missing records', function (): void {
 it('returns missing when no record exists', function (): void {
     $driver = new TableDriver(resolve('db'));
     $user = User::create();
-
     $read = $driver->getWithPresence($user, 'missing');
 
-    expect($read->exists)->toBeFalse()
-        ->and($read->value)->toBeNull();
+    expect($read->exists)->toBeFalse()->and($read->value)->toBeNull();
 });
 
 it('returns null when the stored value is null', function (): void {
@@ -139,8 +137,7 @@ it('returns null when the stored value is null', function (): void {
 
     $read = $driver->getWithPresence($user, 'nullable');
 
-    expect($read->exists)->toBeTrue()
-        ->and($read->value)->toBeNull();
+    expect($read->exists)->toBeTrue()->and($read->value)->toBeNull();
 });
 
 it('returns true when preference exists', function (): void {
@@ -194,8 +191,10 @@ it('stores multiple preference values in a single query', function (): void {
 
 it('throws when the configured table name is invalid', function (): void {
     $driver = new TableDriver(resolve('db'));
-
     $model = UserWithInvalidTable::create();
 
     $driver->all($model);
-})->throws(PreferenceTableNotFound::class, 'The preferences table is not configured for the [users] table.');
+})->throws(
+    PreferenceTableNotFound::class,
+    'The preferences table is not configured for the [users] table.',
+);

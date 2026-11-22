@@ -14,17 +14,11 @@ class DummyPreferenceDriver implements PreferenceDriver
         return [];
     }
 
-    public function clear(HasPreferences $model): void
-    {
-    }
+    public function clear(HasPreferences $model): void {}
 
-    public function delete(HasPreferences $model, string $key): void
-    {
-    }
+    public function delete(HasPreferences $model, string $key): void {}
 
-    public function deleteMultiple(HasPreferences $model, array $keys): void
-    {
-    }
+    public function deleteMultiple(HasPreferences $model, array $keys): void {}
 
     public function get(HasPreferences $model, string $key): mixed
     {
@@ -46,11 +40,7 @@ class DummyPreferenceDriver implements PreferenceDriver
         return true;
     }
 
-    public function set(HasPreferences $model, string $key, mixed $value): void
-    {
-    }
+    public function set(HasPreferences $model, string $key, mixed $value): void {}
 
-    public function setMultiple(HasPreferences $model, array $values): void
-    {
-    }
+    public function setMultiple(HasPreferences $model, array $values): void {}
 }

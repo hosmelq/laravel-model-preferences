@@ -10,8 +10,6 @@ class UserWithInvalidTable extends User
 {
     public function preferencesConfig(): ModelPreferencesConfig
     {
-        return ModelPreferencesConfig::configure()
-            ->withDriver('table')
-            ->withTable('');
+        return ModelPreferencesConfig::configure()->withDriver('table')->withTable('');
     }
 }

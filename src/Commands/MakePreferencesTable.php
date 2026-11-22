@@ -31,7 +31,9 @@ class MakePreferencesTable extends Command
 
         $this->writeMigration($files, $table);
 
-        $this->components->info(sprintf('Migration [%s] created successfully.', $this->getMigrationFileName($table)));
+        $this->components->info(
+            sprintf('Migration [%s] created successfully.', $this->getMigrationFileName($table)),
+        );
 
         return self::SUCCESS;
     }

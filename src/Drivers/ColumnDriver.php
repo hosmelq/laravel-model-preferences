@@ -7,6 +7,7 @@ namespace HosmelQ\ModelPreferences\Drivers;
 use HosmelQ\ModelPreferences\Contracts\HasPreferences;
 use HosmelQ\ModelPreferences\Contracts\PreferenceDriver;
 use HosmelQ\ModelPreferences\Exceptions\PreferenceColumnNotFound;
+use Override;
 
 class ColumnDriver implements PreferenceDriver
 {
@@ -15,6 +16,7 @@ class ColumnDriver implements PreferenceDriver
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function all(HasPreferences $model): array
     {
         return $this->getPreferences($model);
@@ -23,6 +25,7 @@ class ColumnDriver implements PreferenceDriver
     /**
      * Delete all preferences for a model.
      */
+    #[Override]
     public function clear(HasPreferences $model): void
     {
         $this->savePreferences($model, []);
@@ -31,6 +34,7 @@ class ColumnDriver implements PreferenceDriver
     /**
      * Delete a preference for a model.
      */
+    #[Override]
     public function delete(HasPreferences $model, string $key): void
     {
         $preferences = $this->getPreferences($model);
@@ -45,6 +49,7 @@ class ColumnDriver implements PreferenceDriver
      *
      * @param array<int, string> $keys
      */
+    #[Override]
     public function deleteMultiple(HasPreferences $model, array $keys): void
     {
         $preferences = $this->getPreferences($model);
@@ -59,6 +64,7 @@ class ColumnDriver implements PreferenceDriver
     /**
      * Get a preference value for a model.
      */
+    #[Override]
     public function get(HasPreferences $model, string $key): mixed
     {
         $preferences = $this->getPreferences($model);
@@ -73,6 +79,7 @@ class ColumnDriver implements PreferenceDriver
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function getMultiple(HasPreferences $model, array $keys): array
     {
         $preferences = $this->getPreferences($model);
@@ -90,6 +97,7 @@ class ColumnDriver implements PreferenceDriver
     /**
      * Check if a preference exists for a model.
      */
+    #[Override]
     public function has(HasPreferences $model, string $key): bool
     {
         $preferences = $this->getPreferences($model);
@@ -100,6 +108,7 @@ class ColumnDriver implements PreferenceDriver
     /**
      * Determine if a preference is missing for a model.
      */
+    #[Override]
     public function missing(HasPreferences $model, string $key): bool
     {
         return ! $this->has($model, $key);
@@ -108,10 +117,10 @@ class ColumnDriver implements PreferenceDriver
     /**
      * Set a preference value for a model.
      */
+    #[Override]
     public function set(HasPreferences $model, string $key, mixed $value): void
     {
         $preferences = $this->getPreferences($model);
-
         $preferences[$key] = $value;
 
         $this->savePreferences($model, $preferences);
@@ -122,6 +131,7 @@ class ColumnDriver implements PreferenceDriver
      *
      * @param array<string, mixed> $values
      */
+    #[Override]
     public function setMultiple(HasPreferences $model, array $values): void
     {
         $preferences = $this->getPreferences($model);

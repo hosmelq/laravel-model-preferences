@@ -9,7 +9,5 @@ readonly class PreferenceRead
     /**
      * Create a new preference read result.
      */
-    public function __construct(public bool $exists, public mixed $value)
-    {
-    }
+    public function __construct(public bool $exists, public mixed $value) {}
 }

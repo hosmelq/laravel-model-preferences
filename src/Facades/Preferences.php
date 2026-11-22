@@ -10,6 +10,7 @@ use HosmelQ\ModelPreferences\PendingPreferenceInteraction;
 use HosmelQ\ModelPreferences\PreferencesManager;
 use HosmelQ\ModelPreferences\PreferencesStore;
 use Illuminate\Support\Facades\Facade;
+use Override;
 
 /**
  * @method static PreferencesStore driver(null|string $driver = null)
@@ -21,6 +22,7 @@ class Preferences extends Facade
     /**
      * Get the registered name of the component.
      */
+    #[Override]
     protected static function getFacadeAccessor(): string
     {
         return PreferencesManager::class;

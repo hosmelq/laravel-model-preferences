@@ -6,6 +6,7 @@ namespace HosmelQ\ModelPreferences;
 
 use HosmelQ\ModelPreferences\Commands\MakePreferencesTable;
 use Illuminate\Contracts\Container\Container;
+use Override;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -15,6 +16,7 @@ class ModelPreferencesServiceProvider extends PackageServiceProvider
     /**
      * Configure package.
      */
+    #[Override]
     public function configurePackage(Package $package): void
     {
         $package
@@ -34,6 +36,7 @@ class ModelPreferencesServiceProvider extends PackageServiceProvider
     /**
      * Register services.
      */
+    #[Override]
     public function packageRegistered(): void
     {
         $this->app->singleton(PreferencesManager::class, $this->createPreferencesManager(...));

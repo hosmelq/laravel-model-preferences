@@ -21,7 +21,7 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create(PreferencesConfig::storesSharedTable(), function (Blueprint $table) {
+        Schema::create(PreferencesConfig::storesSharedTable(), function (Blueprint $table): void {
             $table->id();
 
             $table->morphs('preferable');

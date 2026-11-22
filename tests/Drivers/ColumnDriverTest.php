@@ -15,7 +15,7 @@ it('returns empty results when no preferences exist', function (): void {
     $driver = new ColumnDriver();
     $user = User::create();
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('returns empty results when preferences column is not an array', function (): void {
@@ -24,7 +24,7 @@ it('returns empty results when preferences column is not an array', function ():
 
     $user->setAttribute('preferences', 'invalid');
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('removes all preferences', function (): void {
@@ -38,7 +38,7 @@ it('removes all preferences', function (): void {
 
     $driver->clear($user);
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('removes a preference', function (): void {
@@ -66,7 +66,7 @@ it('removes multiple preferences', function (): void {
 
     $driver->deleteMultiple($user, ['theme', 'notifications']);
 
-    expect($driver->all($user))->toBe([]);
+    expect($driver->all($user))->toBeEmpty();
 });
 
 it('returns a preference value', function (): void {
@@ -130,8 +130,10 @@ it('stores multiple preference values', function (): void {
 
 it('throws when the configured column is invalid', function (): void {
     $driver = new ColumnDriver();
-
     $model = UserWithInvalidColumn::create();
 
     $driver->all($model);
-})->throws(PreferenceColumnNotFound::class, 'The preferences column is not configured for the [users] table.');
+})->throws(
+    PreferenceColumnNotFound::class,
+    'The preferences column is not configured for the [users] table.',
+);

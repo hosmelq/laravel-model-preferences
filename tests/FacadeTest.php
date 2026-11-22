@@ -12,13 +12,19 @@ it('rejects mismatched model drivers', function (): void {
     $user = User::create();
 
     Preferences::driver('table')->for($user);
-})->throws(InvalidArgumentException::class, 'The model preference driver does not match the selected driver.');
+})->throws(
+    InvalidArgumentException::class,
+    'The model preference driver does not match the selected driver.',
+);
 
 it('requires the interacts with preferences trait', function (): void {
     $model = new PreferencesModelWithoutTrait();
 
     Preferences::for($model);
-})->throws(InvalidArgumentException::class, 'The model must use the InteractsWithPreferences trait.');
+})->throws(
+    InvalidArgumentException::class,
+    'The model must use the InteractsWithPreferences trait.',
+);
 
 it('returns null for missing preferences', function (): void {
     $user = User::create();

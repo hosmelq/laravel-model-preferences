@@ -16,7 +16,7 @@ it('returns empty results when no preferences exist', function (): void {
     $driver = new SharedTableDriver(resolve('db'));
     $model = SharedPreferencesModel::create();
 
-    expect($driver->all($model))->toBe([]);
+    expect($driver->all($model))->toBeEmpty();
 });
 
 it('returns null values stored in the shared table', function (): void {
@@ -46,7 +46,7 @@ it('removes all preferences', function (): void {
 
     $driver->clear($model);
 
-    expect($driver->all($model))->toBe([]);
+    expect($driver->all($model))->toBeEmpty();
 });
 
 it('removes a preference', function (): void {
@@ -74,7 +74,7 @@ it('removes multiple preferences', function (): void {
 
     $driver->deleteMultiple($model, ['theme', 'notifications']);
 
-    expect($driver->all($model))->toBe([]);
+    expect($driver->all($model))->toBeEmpty();
 });
 
 it('returns a preference value', function (): void {
@@ -118,11 +118,9 @@ it('returns null values for missing records', function (): void {
 it('returns missing when no record exists', function (): void {
     $driver = new SharedTableDriver(resolve('db'));
     $model = SharedPreferencesModel::create();
-
     $read = $driver->getWithPresence($model, 'missing');
 
-    expect($read->exists)->toBeFalse()
-        ->and($read->value)->toBeNull();
+    expect($read->exists)->toBeFalse()->and($read->value)->toBeNull();
 });
 
 it('returns null when the stored value is null', function (): void {
@@ -140,8 +138,7 @@ it('returns null when the stored value is null', function (): void {
 
     $read = $driver->getWithPresence($model, 'nullable');
 
-    expect($read->exists)->toBeTrue()
-        ->and($read->value)->toBeNull();
+    expect($read->exists)->toBeTrue()->and($read->value)->toBeNull();
 });
 
 it('returns true when preference exists', function (): void {

@@ -36,8 +36,8 @@ class Config
             sprintf(
                 'Configuration value for key [%s] must be a string or null, %s given.',
                 'model-preferences.stores.shared.connection',
-                gettype($value)
-            )
+                gettype($value),
+            ),
         );
 
         return $value;
@@ -63,8 +63,8 @@ class Config
             sprintf(
                 'Configuration value for key [%s] must be a string or null, %s given.',
                 'model-preferences.stores.table.connection',
-                gettype($value)
-            )
+                gettype($value),
+            ),
         );
 
         return $value;

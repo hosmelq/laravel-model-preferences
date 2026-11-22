@@ -46,7 +46,5 @@ it('adds json casts for column preferences', function (): void {
 
     $user = new User();
 
-    expect($user->getCasts())
-        ->toHaveKey('preferences')
-        ->preferences->toBe('json');
+    expect($user->getCasts())->toHaveKey('preferences')->preferences->toBe('json');
 });
