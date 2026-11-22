@@ -4,83 +4,63 @@ declare(strict_types=1);
 
 namespace HosmelQ\ModelPreferences\Commands;
 
-use function Safe\file_get_contents;
+use HosmelQ\ModelPreferences\Contracts\HasPreferences;
+use HosmelQ\ModelPreferences\Drivers\TableDriver;
+use Illuminate\Console\MigrationGeneratorCommand;
+use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
+use Override;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Date;
-
-class MakePreferencesTable extends Command
+class MakePreferencesTable extends MigrationGeneratorCommand
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected $description = 'Create a new preferences table migration';
+    protected $description = 'Create a migration for the preferences table of a model';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $signature = 'model-preferences:table {name : The name of the preferences table}';
+    protected $signature = 'model-preferences:table {model : The model class}';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(Filesystem $files): int
+    #[Override]
+    protected function migrationStubFile(): string
     {
-        $table = $this->argument('name');
+        return __DIR__.'/../../stubs/table-preferences.stub';
+    }
 
-        $this->writeMigration($files, $table);
+    #[Override]
+    protected function migrationTableName(): string
+    {
+        $model = $this->model();
 
-        $this->components->info(
-            sprintf('Migration [%s] created successfully.', $this->getMigrationFileName($table)),
-        );
+        return new TableDriver()->tableName($model, $model->preferencesConfig());
+    }
 
-        return self::SUCCESS;
+    protected function model(): HasPreferences&Model
+    {
+        $model = new ($this->argument('model'))();
+
+        if (! $model instanceof Model || ! $model instanceof HasPreferences) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The [%s] class must be a model implementing [%s].',
+                    $model::class,
+                    HasPreferences::class,
+                ),
+            );
+        }
+
+        return $model;
     }
 
     /**
-     * Get the migration file name.
+     * @param string $path
+     * @param string $table
      */
-    protected function getMigrationFileName(string $table): string
+    #[Override]
+    protected function replaceMigrationPlaceholders($path, $table): void
     {
-        return Date::now()->format('Y_m_d_His').'_create_'.$table.'_table.php';
-    }
+        $model = $this->model();
 
-    /**
-     * Get the migration file path.
-     */
-    protected function getMigrationPath(string $table): string
-    {
-        return database_path('migrations/'.$this->getMigrationFileName($table));
-    }
-
-    /**
-     * Get the stub file contents.
-     */
-    protected function getStub(): string
-    {
-        return file_get_contents(__DIR__.'/../../stubs/table-preferences.stub');
-    }
-
-    /**
-     * Populate the stub with the table name.
-     */
-    protected function populateStub(string $table): string
-    {
-        $stub = $this->getStub();
-
-        return str_replace('{{ table }}', $table, $stub);
-    }
-
-    /**
-     * Write the migration file to disk.
-     */
-    protected function writeMigration(Filesystem $files, string $table): void
-    {
-        $file = $this->getMigrationPath($table);
-
-        $files->ensureDirectoryExists(dirname($file));
-
-        $files->put($file, $this->populateStub($table));
+        $this->files->put($path, str_replace(
+            ['{{ table }}', '{{ model }}'],
+            [$table, '\\'.$model::class],
+            $this->files->get($this->migrationStubFile()),
+        ));
     }
 }

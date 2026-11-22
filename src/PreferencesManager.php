@@ -5,60 +5,123 @@ declare(strict_types=1);
 namespace HosmelQ\ModelPreferences;
 
 use HosmelQ\ModelPreferences\Contracts\HasPreferences;
+use HosmelQ\ModelPreferences\Contracts\PreferenceDriver;
+use HosmelQ\ModelPreferences\Drivers\ArrayDriver;
 use HosmelQ\ModelPreferences\Drivers\ColumnDriver;
 use HosmelQ\ModelPreferences\Drivers\SharedTableDriver;
 use HosmelQ\ModelPreferences\Drivers\TableDriver;
-use HosmelQ\ModelPreferences\Support\Config as PreferencesConfig;
+use HosmelQ\ModelPreferences\Support\Config;
+use HosmelQ\ModelPreferences\Support\PreferencesConfig;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Manager;
 use Override;
+use UnexpectedValueException;
+use WeakMap;
 
 class PreferencesManager extends Manager
 {
     /**
-     * Create a scoped instance for a model using the default store.
+     * @var WeakMap<HasPreferences&Model, PreferencesConfig>
      */
-    public function for(HasPreferences $model): PendingPreferenceInteraction
-    {
-        /** @var PreferencesStore $store */
-        $store = $this->driver();
+    protected WeakMap $configs;
 
-        return $store->for($model);
+    protected null|ArrayDriver $fake = null;
+
+    public function __construct(Container $container)
+    {
+        parent::__construct($container);
+
+        $this->configs = new WeakMap();
     }
 
-    /**
-     * Get the default store name.
-     */
+    public function config(HasPreferences&Model $model): PreferencesConfig
+    {
+        return $this->configs[$model] ??= $model->preferencesConfig();
+    }
+
+    public function driverFor(PreferencesConfig $config): PreferenceDriver
+    {
+        $driver = $this->fake ?? $this->driver($config->getDriver());
+
+        if (! $driver instanceof PreferenceDriver) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'The [%s] driver must implement [%s].',
+                    $config->getDriver(),
+                    PreferenceDriver::class,
+                ),
+            );
+        }
+
+        return $driver;
+    }
+
+    public function fake(): ArrayDriver
+    {
+        return $this->fake = new ArrayDriver();
+    }
+
+    public function for(HasPreferences&Model $model): PreferenceRepository
+    {
+        $config = $this->config($model);
+
+        return new PreferenceRepository($model, $config, $this->driverFor($config));
+    }
+
     #[Override]
     public function getDefaultDriver(): string
     {
-        return PreferencesConfig::default();
+        return Config::default();
     }
 
     /**
-     * Create the column driver.
+     * @param iterable<Model> $models
      */
-    protected function createColumnDriver(): PreferencesStore
+    public function load(iterable $models): void
     {
-        return new PreferencesStore('column', new ColumnDriver());
+        $groups = [];
+
+        foreach ($models as $model) {
+            if (
+                $model instanceof HasPreferences
+                && $model->exists
+                && isset($model->getAttributes()[$model->getKeyName()])
+            ) {
+                $config = $this->config($model);
+                $groups[implode(
+                    '|',
+                    [
+                        $model::class,
+                        $model->getConnection()->getName(),
+                        $model->getTable(),
+                        $config->getDriver(),
+                        $config->getTable(),
+                        $config->getColumn(),
+                    ],
+                )][] = $model;
+            }
+        }
+
+        foreach ($groups as $group) {
+            $config = $this->config($group[0]);
+
+            $this->driverFor($config)->load($group, $config);
+        }
     }
 
-    /**
-     * Create the shared table driver.
-     */
-    protected function createSharedDriver(): PreferencesStore
+    protected function createColumnDriver(): ColumnDriver
     {
-        return new PreferencesStore('shared', new SharedTableDriver(
-            $this->container->make('db'),
-        ));
+        return new ColumnDriver();
     }
 
-    /**
-     * Create the table driver.
-     */
-    protected function createTableDriver(): PreferencesStore
+    protected function createSharedDriver(): SharedTableDriver
     {
-        return new PreferencesStore('table', new TableDriver(
-            $this->container->make('db'),
-        ));
+        return new SharedTableDriver();
+    }
+
+    protected function createTableDriver(): TableDriver
+    {
+        return new TableDriver();
     }
 }

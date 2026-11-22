@@ -93,3 +93,181 @@ jobs:
 
       - name: Run tests
         run: composer test
+
+  database-mariadb:
+    name: Database - mariadb
+
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        env:
+          MARIADB_DATABASE: testing
+          MARIADB_ROOT_PASSWORD: password
+        image: mariadb:11@sha256:e1d5495f445654134f226f55a41ce0da227116f6f27f283101f405c794d841fc
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-retries=5
+          --health-timeout=5s
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: hosmelq/.github/.github/actions/php-setup@32f4a95b53649f1634b195193a61bb56a6b26d50 # main
+        with:
+          php-extensions: pdo_mysql
+          php-version: '8.4'
+        env:
+          fail-fast: true
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: mariadb
+          DB_URL: mariadb://root:password@127.0.0.1:3306/testing
+        run: composer test
+
+  database-mysql:
+    name: Database - mysql
+
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        env:
+          MYSQL_DATABASE: testing
+          MYSQL_ROOT_PASSWORD: password
+        image: mysql:8.4@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-retries=5
+          --health-timeout=5s
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: hosmelq/.github/.github/actions/php-setup@32f4a95b53649f1634b195193a61bb56a6b26d50 # main
+        with:
+          php-extensions: pdo_mysql
+          php-version: '8.4'
+        env:
+          fail-fast: true
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: mysql
+          DB_URL: mysql://root:password@127.0.0.1:3306/testing
+        run: composer test
+
+  database-pgsql:
+    name: Database - pgsql
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_PASSWORD: password
+        image: postgres:17@sha256:223efeb196329b55b3b9a13db144956411dbc18e727e59f681c3e0aede6475cf
+        options: >-
+          --health-cmd=pg_isready
+          --health-interval=10s
+          --health-retries=5
+          --health-timeout=5s
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: hosmelq/.github/.github/actions/php-setup@32f4a95b53649f1634b195193a61bb56a6b26d50 # main
+        with:
+          php-extensions: pdo_pgsql
+          php-version: '8.4'
+        env:
+          fail-fast: true
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: pgsql
+          DB_URL: pgsql://postgres:password@127.0.0.1:5432/testing
+        run: composer test
+
+  database-sqlsrv:
+    name: Database - sqlsrv
+
+    runs-on: ubuntu-latest
+
+    services:
+      sqlsrv:
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: Passw0rd!
+        image: mcr.microsoft.com/mssql/server:2022-latest@sha256:4525e3efac9f3e241cb003bb2ff2a82818b502f37e12049d788b1a9fa7e13b7f
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Passw0rd! -Q 'SELECT 1'"
+          --health-interval=10s
+          --health-retries=10
+          --health-timeout=5s
+        ports:
+          - 1433:1433
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Prepare SQL Server
+        env:
+          SQLSRV_CONTAINER: ${{ job.services.sqlsrv.id }}
+        run: |
+          docker exec "$SQLSRV_CONTAINER" /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'Passw0rd!' -Q 'CREATE DATABASE testing'
+          curl -fsSL -o packages-microsoft-prod.deb "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - name: Set up PHP
+        uses: hosmelq/.github/.github/actions/php-setup@32f4a95b53649f1634b195193a61bb56a6b26d50 # main
+        with:
+          php-extensions: pdo_sqlsrv
+          php-version: '8.4'
+        env:
+          fail-fast: true
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: sqlsrv
+          DB_URL: sqlsrv://sa:Passw0rd!@127.0.0.1:1433/testing?trust_server_certificate=true
+        run: composer test

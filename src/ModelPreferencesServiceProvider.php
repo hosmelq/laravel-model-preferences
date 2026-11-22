@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace HosmelQ\ModelPreferences;
 
 use HosmelQ\ModelPreferences\Commands\MakePreferencesTable;
-use Illuminate\Contracts\Container\Container;
+use HosmelQ\ModelPreferences\Facades\Preferences;
+use Illuminate\Database\Eloquent\Collection;
 use Override;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -13,9 +14,6 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class ModelPreferencesServiceProvider extends PackageServiceProvider
 {
-    /**
-     * Configure package.
-     */
     #[Override]
     public function configurePackage(Package $package): void
     {
@@ -33,20 +31,19 @@ class ModelPreferencesServiceProvider extends PackageServiceProvider
             ->hasMigration('create_preferences_table');
     }
 
-    /**
-     * Register services.
-     */
+    #[Override]
+    public function packageBooted(): void
+    {
+        Collection::macro('loadPreferences', function (): Collection {
+            Preferences::load($this);
+
+            return $this;
+        });
+    }
+
     #[Override]
     public function packageRegistered(): void
     {
-        $this->app->singleton(PreferencesManager::class, $this->createPreferencesManager(...));
-    }
-
-    /**
-     * Create preferences manager instance.
-     */
-    private function createPreferencesManager(Container $app): PreferencesManager
-    {
-        return new PreferencesManager($app);
+        $this->app->singleton(PreferencesManager::class);
     }
 }

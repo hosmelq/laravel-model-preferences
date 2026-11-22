@@ -9,10 +9,8 @@ return [
     | Default Preference Store
     |--------------------------------------------------------------------------
     |
-    | This option controls the default preference store that will be used.
-    | This connection is utilized if no other store is explicitly specified
-    | when running a preference operation within the application. Models
-    | may override this default by implementing preferencesConfig().
+    | This option controls the store used by models that do not select one
+    | with withDriver() in their preferencesConfig() method.
     |
     | Supported: "column", "shared", "table"
     |
@@ -25,26 +23,21 @@ return [
     | Preference Stores
     |--------------------------------------------------------------------------
     |
-    | Here, you can define all the preference stores for your application
-    | along with their respective drivers.
+    | The column store keeps preferences in a JSON column of the model's table.
+    | The shared store keeps every model's preferences in one polymorphic
+    | table, on the given connection or the default one. The table store uses
+    | the connection of each model.
     |
     */
 
     'stores' => [
 
         'column' => [
-            'driver' => 'column',
             'name' => env('MODEL_PREFERENCES_COLUMN_NAME', 'preferences'),
         ],
 
-        'table' => [
-            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
-            'driver' => 'table',
-        ],
-
         'shared' => [
-            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION', env('DB_CONNECTION')),
-            'driver' => 'shared',
+            'connection' => env('MODEL_PREFERENCES_DB_CONNECTION'),
             'table' => env('MODEL_PREFERENCES_TABLE', 'preferences'),
         ],
 
